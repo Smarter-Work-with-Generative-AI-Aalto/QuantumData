@@ -67,6 +67,8 @@ model User {
   accounts    Account[]
   sessions    Session[]
   invitations Invitation[]
+  aiRequestQueues AIRequestQueue[]
+  aiActivityLogs  AIActivityLog[]
 }
 
 model Team {
@@ -82,6 +84,10 @@ model Team {
   members         TeamMember[]
   invitations     Invitation[]
   apiKeys         ApiKey[]
+  documents       Document[]
+  aiModels        AIModel[]
+  aiRequestQueues AIRequestQueue[]
+  aiActivityLogs  AIActivityLog[]
 
   @@index([billingId])
 }
@@ -218,3 +224,97 @@ model jackson_ttl {
   @@index([expiresAt], map: "_jackson_ttl_expires_at")
   @@ignore
 }
+
+model Document {
+  id        String           @id @default(uuid())
+  teamId    String
+  fileName  String
+  title     String
+  content   String
+  type      String
+  status    String
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @default(now())
+
+  team      Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  embedding DocumentVector[]
+
+  @@index([teamId])
+}
+
+model DocumentVector {
+  id         String   @id @default(uuid())
+  documentId String?
+  embedding  Json?
+  content    String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+
+  document   Document? @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+}
+
+model AIModel {
+  id                          String   @id @default(uuid())
+  teamId                      String
+  provider                    String
+  azureOpenAIApiDeploymentName String?
+  azureOpenAIApiVersion        String?
+  azureOpenAIBasePath          String?
+  azureOpenAIApiKey            String?
+  openAIApiKey                 String?
+  googleAIApiKey               String?
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @default(now())
+
+  team                        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
+}
+
+model AIRequestQueue {
+  id                 String   @id @default(uuid())
+  userId             String
+  teamId             String
+  documentIds        String[] @default([])
+  userSearchQuery    String
+  similarityScore    Float?   @default(1.0)
+  sequentialQuery    Boolean  @default(true)
+  enhancedSearch     Boolean  @default(false)
+  status             String   @default("in queue")
+  individualFindings Json?
+  overallSummary     Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([teamId])
+}
+
+model AIActivityLog {
+  id                 String   @id @default(uuid())
+  userId             String
+  teamId             String
+  documentIds        String[]
+  userSearchQuery    String
+  similarityScore    Float?
+  sequentialQuery    Boolean
+  enhancedSearch     Boolean
+  status             String
+  individualFindings Json
+  overallSummary     Json
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([teamId])
+}
+

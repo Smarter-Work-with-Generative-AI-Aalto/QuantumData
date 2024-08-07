@@ -55,3 +55,6 @@ yarn-error.log*
 .vscode
 # Sentry Config File
 .sentryclirc
+
+# uploads directory
+uploads

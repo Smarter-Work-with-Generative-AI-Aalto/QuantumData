@@ -171,3 +171,15 @@ export const ssoVerifySchema = z
   .refine((data) => data.email || data.slug, {
     message: 'At least one of email or slug is required',
   });
+
+export const AIModelSchema = z.object({
+  id: z.string().optional(),
+  provider: z.string(),
+  azureOpenAIApiDeploymentName: z.string().optional(),
+  azureOpenAIApiVersion: z.string().optional(),
+  azureOpenAIBasePath: z.string().optional(),
+  azureOpenAIApiKey: z.string().optional(),
+  openAIApiKey: z.string().optional(),
+  googleAIApiKey: z.string().optional(),
+});
+

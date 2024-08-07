@@ -13,6 +13,8 @@ import useCanAccess from 'hooks/useCanAccess';
 import Link from 'next/link';
 import { TeamFeature } from 'types';
 
+// console.log('TeamTab component loaded');
+
 interface TeamTabProps {
   activeTab: string;
   team: Team;
@@ -110,6 +112,18 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
       href: `/teams/${team.slug}/api-keys`,
       active: activeTab === 'api-keys',
       icon: KeyIcon,
+    });
+  }
+
+  if (
+    teamFeatures.aiModel &&
+    canAccess('team_ai_model', ['create', 'update', 'read'])
+  ) {
+    navigations.push({
+      name: 'AI Models',
+      href: `/teams/${team.slug}/ai-models`,
+      active: activeTab === 'ai-models',
+      icon: Cog6ToothIcon,
     });
   }
 

@@ -104,6 +104,7 @@ const env = {
             process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET
           ),
     deleteTeam: process.env.FEATURE_TEAM_DELETION !== 'false',
+    aiModel: process.env.FEATURE_TEAM_AI_MODEL !== 'false',
   },
 
   recaptcha: {

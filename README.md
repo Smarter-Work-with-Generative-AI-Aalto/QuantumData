@@ -1,30 +1,36 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/boxyhq/jackson/assets/66887028/871d9c0f-d351-49bb-9458-2542830d7910">
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/boxyhq/jackson/assets/66887028/4073c181-0653-4d5b-b74f-e7e84fe79da8">
-  <img alt="BoxyHQ Banner" src="https://github.com/boxyhq/jackson/assets/66887028/b40520b7-dbce-400b-88d3-400d1c215ea1">
-</picture>
+<div align="center">
+    <img height="400px" alt="QuantumData Banner" src="assets/QuantumData_Banner.png">
+</div>
 
-# ⭐ Enterprise SaaS Starter Kit
+# QuantumData
 
 <p>
-    <a href="https://github.com/boxyhq/saas-starter-kit/stargazers"><img src="https://img.shields.io/github/stars/boxyhq/saas-starter-kit" alt="Github stargazers"></a>
-    <a href="https://github.com/boxyhq/saas-starter-kit/issues"><img src="https://img.shields.io/github/issues/boxyhq/saas-starter-kit" alt="Github issues"></a>
-    <a href="https://github.com/boxyhq/saas-starter-kit/blob/main/LICENSE"><img src="https://img.shields.io/github/license/boxyhq/saas-starter-kit" alt="license"></a>
-    <a href="https://twitter.com/BoxyHQ"><img src="https://img.shields.io/twitter/follow/BoxyHQ?style=social" alt="Twitter"></a>
-    <a href="https://www.linkedin.com/company/boxyhq"><img src="https://img.shields.io/badge/LinkedIn-blue" alt="LinkedIn"></a>
-    <a href="https://discord.gg/uyb7pYt4Pa"><img src="https://img.shields.io/discord/877585485235630130" alt="Discord"></a>
+    <a href="https://github.com/ali-amaan/QuantumData/stargazers"><img src="https://img.shields.io/github/stars/ali-amaan/QuantumData" alt="Github stargazers"></a>
+    <a href="https://github.com/ali-amaan/QuantumData/issues"><img src="https://img.shields.io/github/issues/ali-amaan/QuantumData" alt="Github issues"></a>
+    <a href="https://github.com/ali-amaan/QuantumData/blob/main/LICENSE"><img src="https://img.shields.io/github/license/ali-amaan/QuantumData" alt="license"></a>
+    <a href="https://www.linkedin.com/in/henri-schildt-57280"><img src="https://img.shields.io/badge/LinkedIn-blue" alt="LinkedIn"></a>
 </p>
 
-The Open Source Next.js SaaS boilerplate for Enterprise SaaS app development.
+QuantumData is an AI-based qualitative research tool designed to help researchers efficiently find and extract relevant information from their custom documents store for a smooth and efficient qualitative research experience using generative AI.
 
-Please star ⭐ the repo if you want us to continue developing and improving the SaaS Starter Kit! 😀
+>Please star ⭐ the repo if you want us to continue developing and improving the qualitative research tool! 😀
 
-## 📖 Additional Resources
+## 🥇 Features
 
-Video - [BoxyHQ's SaaS Starter Kit: Your Ultimate Enterprise-Compliant Boilerplate](https://www.youtube.com/watch?v=oF8QIwQIhyo) <br>
-Blog - [Enterprise-ready Saas Starter Kit](https://boxyhq.com/blog/enterprise-ready-saas-starter-kit)
+- [x] AI-powered document retrieval
+- [x] Natural language processing to understand user queries
+- [x] Retrieval Augmented Generation (RAG) based extractions
+- [x] Supports multiple file formats (PDF, DOCX, TXT)
 
-Next.js-based SaaS starter kit saves you months of development by starting you off with all the features that are the same in every product, so you can focus on what makes your app unique.
+## ➡️ Coming Soon
+- [ ] Create Account
+- [ ] Sign in with Email and Password
+- [ ] User-friendly web interface
+- [ ] Database integration
+- [ ] Cloud Deployement Ready
+- [ ] Sign in with Google [Setting up Google OAuth]
+- [ ] Responsive UI
+- [ ] Comet Haley
 
 ## 🛠️ Built With
 
@@ -40,14 +46,10 @@ Next.js-based SaaS starter kit saves you months of development by starting you o
   This is an open-source database toolkit. It's used for object-relational mapping, which simplifies the process of writing database queries. Prisma configuration and schema can be found in the prisma directory.
 - [TypeScript](https://www.typescriptlang.org)
   This is a typed superset of JavaScript that compiles to plain JavaScript. It's used to make the code more robust and maintainable. TypeScript definitions and configurations can be found in files like next-env.d.ts and i18next.d.ts.
-- [SAML Jackson](https://github.com/boxyhq/jackson) (Provides SAML SSO, Directory Sync)
-  This is a service for handling SAML SSO (Single Sign-On). It's used to allow users to sign in with a single ID and password to any of several related systems i.e (using a single set of credentials). The implementation of SAML Jackson is primarily located within the files associated with authentication.
 - [Svix](https://www.svix.com/) (Provides Webhook Orchestration)
   This is a service for handling webhooks. It's used to emit events on user/team CRUD operations, which can then be caught and handled by other parts of the application or external services. The integration of Svix is distributed throughout the codebase, primarily in areas where Create, Read, Update, and Delete (CRUD) operations are executed.
 - [Retraced](https://github.com/retracedhq/retraced) (Provides Audit Logs Service)
   This is a service for audit logging and data visibility. It helps track user activities within the application i.e (who did what and when in the application). The usage of Retraced would be dispersed throughout the codebase, likely in the files where important actions are performed.
-- [Stripe](https://stripe.com) (Provides Payments)
-  This is a service for handling payments. It's used to process payments for the application. The integration of Stripe is likely found in the files associated with billing and subscriptions.
 - [Playwright](https://playwright.dev) (Provides E2E tests)
   This is a Node.js library for automating browsers. It's used to run end-to-end tests on the application. The Playwright configuration and tests can be found in the tests directory.
 - [Docker](https://www.docker.com) (Provides Docker Compose)
@@ -55,19 +57,9 @@ Next.js-based SaaS starter kit saves you months of development by starting you o
 - [NextAuth.js](https://next-auth.js.org) (Provides Authentication)
   This is a complete open-source authentication solution for Next.js applications. It's used to handle user authentication and authorization. The NextAuth.js configuration and providers can be found in the pages/api/auth/[...nextauth].ts file.
 
-## 🚀 Deployment
+## 🖥️ Preview
 
-<a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fboxyhq%2Fsaas-starter-kit&env=NEXTAUTH_SECRET,SMTP_HOST,SMTP_PORT,SMTP_USER,SMTP_PASSWORD,SMTP_FROM,DATABASE_URL,APP_URL">
-<img width="90" alt="Deploy with Vercel" src="https://vercel.com/button" />
-</a>
-
-<a href="https://heroku.com/deploy" alt="Deploy to Heroku">
-<img alt="Deploy to Heroku" src="https://www.herokucdn.com/deploy/button.svg" />
-</a>
-
-<a href="https://cloud.digitalocean.com/apps/new?repo=https://github.com/boxyhq/saas-starter-kit/tree/main" alt="Deploy to DO">
-<img width="200" alt="Deploy to DO" src="https://www.deploytodo.com/do-btn-blue-ghost.svg" />
-</a>
+[See & Interact with Figma Prototype](https://www.figma.com/proto/PvdjyWAPBUjxHYr5FXgK4Q/GPTCoding---QuantumData?page-id=0%3A1&node-id=1-50&viewport=1451%2C479%2C0.61&t=qwy4eiXgETIhcv0a-1&scaling=scale-down&starting-point-node-id=1%3A50) 
 
 ## ✨ Getting Started
 
@@ -84,7 +76,7 @@ Please follow these simple steps to get a local copy up and running.
 
 #### 1. Setup
 
-- [Fork](https://github.com/boxyhq/saas-starter-kit/fork) the repository
+- [Fork](https://github.com/Smarter-Work-with-Generative-AI-Aalto/QuantumData) the repository
 - Clone the repository by using this command:
 
 ```bash
@@ -133,104 +125,90 @@ In a development environment:
 npm run dev
 ```
 
-#### 8. Start the Prisma Studio
+## 🚀 Usage
 
-Prisma Studio is a visual editor for the data in your database.
+1. **Upload your documents**
 
-```bash
-npx prisma studio
-```
+    You can upload your research documents through the web interface. The application supports PDF, DOCX, and TXT formats.
 
-#### 9. Testing
+2. **Query the AI**
 
-We are using [Playwright](https://playwright.dev/) to execute E2E tests. Add all tests inside the `/tests` folder.
+    Enter your research question or query in natural language. The AI will process your query and retrieve relevant documents.
 
-Update `playwright.config.ts` to change the playwright configuration.
+3. **View results**
 
-##### Install Playwright dependencies
-
-```bash
-npm run playwright:update
-```
-
-##### Run E2E tests
-
-```bash
-npm run test:e2e
-```
-
-_Note: HTML test report is generated inside the `report` folder. Currently supported browsers for test execution `chromium` and `firefox`_
-
-#### Fully customizable boilerplate out of the box, see images below 👇👇👇
-
-![saas-starter-kit-poster](/public/saas-starter-kit-poster.png)
-
-## 🥇 Features
-
-- Create account
-- Sign in with Email and Password
-- Sign in with Magic Link
-- Sign in with SAML SSO
-- Sign in with Google [[Setting up Google OAuth](https://support.google.com/cloud/answer/6158849?hl=en)]
-- Sign in with GitHub [[Creating a Github OAuth App](https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app)]
-- Directory Sync (SCIM)
-- Update account
-- Create team
-- Delete team
-- Invite users to the team
-- Manage team members
-- Update team settings
-- Webhooks & Events
-- Internationalization
-- Audit logs
-- Roles and Permissions
-- Dark mode
-- Email notifications
-- E2E tests
-- Docker compose
-- Prisma Studio
-- Update member role
-- Directory Sync Events
-- Avatar Upload
-- SAML SSO
-- Audit Log
-- Webhook
-- Payments
-- Security Headers
-
-## ➡️ Coming Soon
-
-- Billing & subscriptions
-- Unit and integration tests
+    The AI will display the relevant documents along with extracted information related to your query.
 
 ## ✨ Contributing
+
+### Guidelines
 
 Thanks for taking the time to contribute! Contributions make the open-source community a fantastic place to learn, inspire, and create. Any contributions you make are greatly appreciated.
 
 Please try to create bug reports that are:
 
-- _Reproducible._ Include steps to reproduce the problem.
-- _Specific._ Include as much detail as possible: which version, what environment, etc.
-- _Unique._ Do not duplicate existing opened issues.
-- _Scoped to a Single Bug._ One bug per report.
+- Reproducible. Include steps to reproduce the problem.
+- Specific. Include as much detail as possible: which version, what environment, etc.
+- Unique. Do not duplicate existing opened issues.
+- Scoped to a Single Bug. One bug per report.
 
-[Contributing Guide](https://github.com/boxyhq/saas-starter-kit/blob/main/CONTRIBUTING.md)
+See [Contributing Guide](CONTRIBUTING.md)
 
-## 🤩 Community
+### Contributors
 
-- [Discord](https://discord.gg/uyb7pYt4Pa) (For live discussion with the Open-Source Community and BoxyHQ team)
-- [Twitter](https://twitter.com/BoxyHQ) / [LinkedIn](https://www.linkedin.com/company/boxyhq) (Follow us)
-- [Youtube](https://www.youtube.com/@boxyhq) (Watch community events and tutorials)
-- [GitHub Issues](https://github.com/boxyhq/saas-starter-kit/issues) (Contributions, report issues, and product ideas)
-
-## 🌍 Contributors
-
-<a href="https://github.com/boxyhq/saas-starter-kit/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=boxyhq/saas-starter-kit" />
+<a href="https://github.com/ali-amaan/QuantumData/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ali-amaan/QuantumData" />
 </a>
 
-Made with [contrib.rocks](https://contrib.rocks).
+### Steps For Contributing
+
+We welcome contributions from the community! Here’s how you can help:
+
+1. **Fork the repository**
+
+    Click the "Fork" button at the top-right corner of this repository.
+
+2. **Clone your fork**
+
+    ```bash
+    git clone https://github.com/your-username/QuantumData.git
+    cd QuantumData
+    ```
+
+3. **Create a new branch**
+
+    ```bash
+    git checkout -b feature-branch-name
+    ```
+
+4. **Make your changes**
+
+    Implement your changes and commit them with a clear and descriptive commit message.
+
+5. **Push to your fork**
+
+    ```bash
+    git push origin feature-branch-name
+    ```
+
+6. **Create a pull request**
+
+    Open a pull request on the original repository to merge your changes.
 
 ## 🛡️ License
 
-[Apache 2.0 License](https://github.com/boxyhq/saas-starter-kit/blob/main/LICENSE)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgements
+
+- [Professor Henri Schildt](https://www.aalto.fi/en/people/henri-schildt) for initial concept and ideation as well as a working prototype
+
+## Contact
+
+For any questions or suggestions, feel free to reach out to us via [email](mailto:henri.schildt@aalto.fi).
+
+---
+
+<p align="center">
+  Made with ❤️ in Helsinki
+</p>

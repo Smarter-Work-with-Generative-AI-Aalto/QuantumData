@@ -27,45 +27,33 @@ We have a list of help wanted that contains small features and bugs with a relat
 
 Please follow these simple steps to get a local copy up and running.
 
-### 1. Setup
+1. **Fork the repository**
 
-- [Fork](https://github.com/boxyhq/saas-starter-kit/fork) the repository
-- Clone the repository by using this command:
+    Click the [Fork](https://github.com/ali-amaan/QuantumData) button at the top-right corner of this repository.
 
-```bash
-git clone https://github.com/<your_github_username>/saas-starter-kit.git
-```
+2. **Clone your fork**
 
-### 2. Go to the project folder
+    ```bash
+    git clone https://github.com/your-username/QuantumData.git
+    cd QuantumData
+    ```
 
-```bash
-cd saas-starter-kit
-```
+3. **Create a new branch**
 
-### 3. Install dependencies
+    ```bash
+    git checkout -b feature-branch-name
+    ```
 
-```bash
-npm install
-```
+4. **Make your changes**
 
-### 4. Set up your .env file
+    Implement your changes and commit them with a clear and descriptive commit message.
 
-Duplicate `.env.example` to `.env`.
+5. **Push to your fork**
 
-```bash
-cp .env.example .env
-```
+    ```bash
+    git push origin feature-branch-name
+    ```
 
-### 5. Set up database schema
+6. **Create a pull request**
 
-```bash
-npx prisma db push
-```
-
-### 6. Start the server
-
-In a development environment:
-
-```bash
-npm run dev
-```
+    Open a pull request on the original repository to merge your changes.
