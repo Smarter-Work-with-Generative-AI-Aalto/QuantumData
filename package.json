@@ -31,7 +31,7 @@
     "@azure/storage-blob": "^12.23.0",
     "@boxyhq/metrics": "0.2.8",
     "@boxyhq/react-ui": "3.3.43",
-    "@boxyhq/saml-jackson": "1.26.7",
+    "@boxyhq/saml-jackson": "1.28.1",
     "@heroicons/react": "2.1.4",
     "@langchain/community": "^0.2.20",
     "@langchain/openai": "^0.2.5",
