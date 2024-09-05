@@ -131,6 +131,10 @@ const ResearchComponent = ({ team }: { team: any }) => {
             }
 
             toast.success(`Research request submitted successfully`);
+
+            // Redirect to activity log after successful submission
+            window.location.href = `/teams/${team.slug}/activity-log`;
+            
         } catch (err) {
             setError(String(err));
         } finally {
