@@ -39,7 +39,7 @@ const ConfigureAIModels = ({ team }) => {
                 });
 
                 if (!response.ok) {
-                    toast.error(`Failed to fetch AI models`);
+                    toast.error(t('failed-to-fetch-ai-models'));
                     throw Error('Failed to fetch AI models');
                 }
 

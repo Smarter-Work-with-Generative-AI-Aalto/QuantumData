@@ -6,49 +6,49 @@ import ResearchSummary from '../research/ResearchSummary';
 import IndividualFindings from '../research/IndividualFindings';
 import LoadingSkeleton from '../research/LoadingSkeleton';
 import Error from '../shared/Error';
+import toast from 'react-hot-toast';
 
-const ResearchResultsPage = () => {
+// Define the shape of your results object
+interface ResearchResults {
+    overallSummary: string;
+    sources: any[]; // Adjust this to match the type of your sources if needed
+    individualFindings: Array<{
+        page: string;
+        title: string;
+        content: string;
+    }>;
+}
+
+const ResearchResultsPage = ({ resultId }: { resultId: string }) => {
     const { t } = useTranslation('common');
     const [loading, setLoading] = useState(true);
-    const [results, setResults] = useState(null);
+    const [results, setResults] = useState<ResearchResults | null>(null);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
     const { id } = router.query;
 
     useEffect(() => {
-        // Simulate API call
-        setTimeout(() => {
-            // Dummy data
-            setResults({
-                summary: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-                sources: [
-                    { title: "Research Document A.pdf", page: "Page 12" },
-                    { title: "Research Document B.pdf", page: "Page 3" },
-                    { title: "204550454220.doc", page: "Page 5" },
-                ],
-                findings: [
-                    {
-                        title: "Research Document A.pdf",
-                        page: "Page 12",
-                        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-                    },
-                    {
-                        title: "Research Document B.pdf",
-                        page: "Page 3",
-                        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-                    },
-                    {
-                        title: "204550454220.doc",
-                        page: "Page 5",
-                        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-                    },
-                ],
-            });
-            setLoading(false);
-        }, 10000); // Simulate a 2 second delay for the API call
-    }, [id]);
+        const fetchResults = async () => {
+            setLoading(true);
+            try {
+                const response = await fetch(`/api/ai-research/${resultId}`);
+                if (!response.ok) {
+                    toast.error('Failed to fetch results');
+                }
+                const data = await response.json();
+                console.log(data);
+                setResults(data);
+            } catch (err) {
+                setError(String(err));
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchResults();
+    }, [resultId]);
 
     if (loading) return <LoadingSkeleton />;
+    if (error) return <Error message={error} />;
 
     return (
         <div className="flex flex-col pb-6">
@@ -58,8 +58,8 @@ const ResearchResultsPage = () => {
             {error && <Error message={error} />}
             {results && (
                 <>
-                    <ResearchSummary summary={results.summary} sources={results.sources} />
-                    <IndividualFindings findings={results.findings} />
+                    <ResearchSummary summary={results.overallSummary} sources={results.sources} />
+                    <IndividualFindings findings={results.individualFindings} />
                 </>
             )}
         </div>

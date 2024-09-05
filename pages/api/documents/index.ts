@@ -1,4 +1,4 @@
-//pages/api/documents/index.ts
+// pages/api/documents/index.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from '@/lib/session';
 import { IncomingForm } from 'formidable';
@@ -184,7 +184,7 @@ async function createDocumentHandler(req: NextApiRequest, res: NextApiResponse) 
                 await vectorizeChunks(newDocument.id, newDocument.teamId, newDocument.title, newDocument.content, newDocument.type);
 
                 const vectors = await getVectorsForDocumentFromVectorDB(newDocument.id, newDocument.teamId);
-                console.log(vectors);
+
                 await addVectorsInPrismaDB(vectors, newDocument.id);
 
                 // Update the document status to 'Ready'

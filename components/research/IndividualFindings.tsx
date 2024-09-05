@@ -43,7 +43,7 @@ const IndividualFindings = ({ findings }) => {
                 </div>
                 <div>
                   <h4 className="font-semibold">{t(finding.title)}</h4>
-                  <span className="text-gray-500 text-sm">{finding.page}</span>
+                  <span className="text-gray-500 text-sm">{t('page')} {finding.page}</span>
                 </div>
               </div>
               <div className="tooltip" data-tip={tooltipText[index]}>

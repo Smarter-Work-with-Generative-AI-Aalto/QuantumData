@@ -1,6 +1,8 @@
 //components/research/ResearchComponent.tsx
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
+// import { getUserBySession } from '../../models/user';
+// import { useSession } from 'next-auth/react';
 import Error from '../shared/Error';
 import Loading from '../shared/Loading';
 import Card from '../shared/Card';
@@ -17,6 +19,8 @@ const ResearchComponent = ({ team }: { team: any }) => {
     const [documents, setDocuments] = useState<any[]>([]);
     const [loading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    // const { data: session, status } = useSession(); // Hook from next-auth to get the session
+    // const [userId, setUserId] = useState<string | null>(null);
 
     useEffect(() => {
         const loadDocuments = async () => {
@@ -37,6 +41,23 @@ const ResearchComponent = ({ team }: { team: any }) => {
         };
         loadDocuments();
     }, [team.id]);
+
+    // useEffect(() => {
+    //     const fetchUserId = async () => {
+    //       if (session && status === 'authenticated') {
+    //         try {
+    //           const user = await getUserBySession(session);
+    //           if (user) {
+    //             setUserId(user.id); // Set the userId in state
+    //           }
+    //         } catch (error) {
+    //           console.error('Error fetching user:', error);
+    //         }
+    //       }
+    //     };
+    
+    //     fetchUserId();
+    //   }, [session, status]);
 
 
     const truncateFileName = (name: string, maxLength: number = 25) => {
@@ -70,7 +91,6 @@ const ResearchComponent = ({ team }: { team: any }) => {
         switch (type) {
             case 'application/pdf': return <BsFiletypePdf className="text-4xl" />;
             case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': return <BsFiletypeDoc className="text-4xl" />;
-            //case 'xlsx': return <BsFiletypeXls className="text-4xl" />;
             case 'application/vnd.openxmlformats-officedocument.presentationml.presentation': return <BsFiletypePpt className="text-4xl" />;
             case 'text/csv': return <BsFiletypeCsv className="text-4xl" />;
             case 'text/plain': return <BsFiletypeTxt className="text-4xl" />;
@@ -78,7 +98,47 @@ const ResearchComponent = ({ team }: { team: any }) => {
         }
     };
 
-    const visibleDocuments = documents.slice(0, 5); // Display first 7 documents
+    const handleSubmit = async () => {
+        // if (!userId) {
+        //     toast.error('User ID not found');
+        //     return;
+        // }
+
+        if (!query || selectedDocuments.length === 0) {
+            toast.error('Please enter a query and select at least one document');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await fetch('/api/ai-research', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: "",
+                    teamId: team.id,
+                    documentIds: selectedDocuments,
+                    userSearchQuery: query,
+                    similarityScore: 0.8, // Example score
+                    sequentialQuery: true,
+                    enhancedSearch: false,
+                }),
+            });
+
+            if (!response.ok) {
+                toast.error(`Failed to submit research request`);
+                throw new Error('Failed to submit research request');
+            }
+
+            toast.success(`Research request submitted successfully`);
+        } catch (err) {
+            setError(String(err));
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const visibleDocuments = documents.slice(0, 5);
 
     return (
         <div className="p-4">
@@ -129,10 +189,11 @@ const ResearchComponent = ({ team }: { team: any }) => {
             </Card>
 
             <div className="mt-8">
-                <Button color="neutral" fullWidth>
+                <Button color="neutral" fullWidth onClick={handleSubmit} disabled={!query || selectedDocuments.length === 0}>
                     {t('research')}
                 </Button>
             </div>
+            
             {loading && <Loading />}
             {error && <Error message={error} />}
 

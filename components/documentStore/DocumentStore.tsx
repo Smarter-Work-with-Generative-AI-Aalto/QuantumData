@@ -20,7 +20,6 @@ const DocumentStore = ({ team }: { team: any }) => {
         fetch(`/api/documents?teamId=${team.id}`)
             .then((response) => {
                 if (!response.ok) {
-                    toast.error(`Failed to fetch documents`);
                     throw Error(`Failed to fetch documents`);
                 }
                 return response.json();
@@ -42,6 +41,7 @@ const DocumentStore = ({ team }: { team: any }) => {
             })
             .catch((error) => {
                 console.error('Error fetching documents:', error);
+                toast.error(t('failed-to-fetch-documents'));
                 setError(`Failed to load documents. Please try again later.`);
             })
             .finally(() => setIsLoading(false));
@@ -83,7 +83,6 @@ const DocumentStore = ({ team }: { team: any }) => {
             });
 
             if (!response.ok) {
-                toast.error(`Failed to upload document`);
                 throw Error('Failed to upload document');
             }
 
@@ -102,8 +101,10 @@ const DocumentStore = ({ team }: { team: any }) => {
                 })),
             ]);
             setError(null);
+            toast.success(t('document-uploaded-successfully'))
         } catch (error) {
             console.error('Error uploading document:', error);
+            toast.error(t('failed-to-upload-document'));
             setError(`Failed to upload document. Please try again later.`);
         }
     };
@@ -119,14 +120,15 @@ const DocumentStore = ({ team }: { team: any }) => {
             });
 
             if (!response.ok) {
-                toast.error(`Failed to delete document`);
                 throw Error('Failed to delete document');
             }
 
             setDocuments((prevDocuments) => prevDocuments.filter((doc) => doc.id !== id));
             setError(null);
+            toast.success(t('document-deleted-successfully'))
         } catch (error) {
             console.error('Error deleting document:', error);
+            toast.error(t('Failed to delete document'));
             setError(`Failed to delete document. Please try again later.`);
         }
     };
@@ -138,6 +140,7 @@ const DocumentStore = ({ team }: { team: any }) => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        toast.success(t('document-downloaded'));
     };
 
     return (

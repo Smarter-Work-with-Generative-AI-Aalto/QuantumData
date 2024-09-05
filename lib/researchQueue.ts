@@ -1,6 +1,7 @@
-//lib/researchQueue.ts
+// lib/researchQueue.ts
 import { prisma } from '../lib/prisma';
-import { createRAGChain, createOpenAISummary } from '../lib/langchainIntegration';
+import { sequentialRAGChain, createRAGChain, createOpenAISummary } from '../lib/langchainIntegration';
+import { getVectorsForDocumentFromVectorDB } from '../lib/vectorization';
 
 export async function processResearchRequestQueue(teamId: string) {
     const pendingRequest = await prisma.aIRequestQueue.findFirst({
@@ -23,7 +24,11 @@ export async function processResearchRequestQueue(teamId: string) {
 
     for (let i = 0; i < documentIds.length; i++) {
         const documentId = documentIds[i];
-        const findings = await handleDocumentSearch(documentId, userSearchQuery, sequentialQuery);
+
+        // Retrieve document chunks using getVectorsForDocumentFromVectorDB
+        const documentChunks = await getVectorsForDocumentFromVectorDB(documentId, teamId);
+        console.log(documentChunks);
+        const findings = await handleDocumentSearch(documentChunks, userSearchQuery, sequentialQuery, teamId);
 
         allFindings = allFindings.concat(findings);
 
@@ -60,27 +65,40 @@ export async function processResearchRequestQueue(teamId: string) {
     });
 }
 
-async function handleDocumentSearch(documentId: string, query: string, sequential: boolean) {
-    const documentChunks = await retrieveDocumentChunks(documentId);
+const extractMetadataValue = (metadataAttributes, key) => {
+    const attribute = metadataAttributes.find(attr => attr.key === key);
+    return attribute ? attribute.value : 'N/A';
+};
+
+async function handleDocumentSearch(documentChunks: { content: string, metadata: any }[], query: string, sequential: boolean, teamId: string) {
+    const allFindings: { title: string, page: string, content: string }[] = [];
 
     if (sequential) {
-        // Process chunks sequentially
-        const allResults = [];
-
         for (const chunk of documentChunks) {
-            const result = await createRAGChain(query, [chunk]);
-            allResults.push(result);
+            const result = await createRAGChain(query, [chunk], teamId);
+            
+            const finding = {
+                title: extractMetadataValue(chunk.metadata.attributes, 'title') || 'Untitled Document',
+                page: extractMetadataValue(chunk.metadata.attributes, 'pageNumber') || 'N/A',
+                content: result,
+            };
+
+            allFindings.push(finding);
         }
-
-        return allResults;
     } else {
-        // Process chunks in parallel
-        return await createRAGChain(query, documentChunks);
-    }
-}
+        const results = await createRAGChain(query, documentChunks, teamId);
 
-async function retrieveDocumentChunks(documentId: string) {
-    // Retrieve document chunks from your storage (e.g., vector store, database)
-    // This is a placeholder, replace it with your actual retrieval logic
-    return [];
+        // results.forEach((result, index) => {
+        //     const chunk = documentChunks[index];
+        //     const finding = {
+        //         title: chunk.metadata.title || 'Untitled Document',
+        //         page: chunk.metadata.pageNumber || 'N/A',
+        //         content: result,
+        //     };
+
+        //     allFindings.push(finding);
+        // });
+    }
+
+    return allFindings;
 }

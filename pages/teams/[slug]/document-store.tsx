@@ -1,3 +1,4 @@
+//pages/teams/[slug]/document-store.tsx
 import React from 'react';
 import { GetServerSidePropsContext } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';

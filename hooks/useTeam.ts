@@ -1,3 +1,4 @@
+// hooks/useTeam.ts
 import fetcher from '@/lib/fetcher';
 import type { Team } from '@prisma/client';
 import { useRouter } from 'next/router';

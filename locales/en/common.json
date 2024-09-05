@@ -296,6 +296,26 @@
   "overall-summary": "Overall Summary",
   "sources": "Sources",
   "[": "[",
-  "]": "]"
+  "]": "]",
+  "failed-to-fetch-documents": "Failed to fetch documents",
+  "failed-to-delete-document": "Failed to delete document",
+  "failed-to-fetch-ai-models": "Failed to fetch AI models",
+  "document-uploaded-successfully": "Document uploaded successfully",
+  "document-deleted-successfully": "Document deleted successfully",
+  "document-downloaded": "Document downloaded",
+  "failed-to-upload-document": "Failed to upload document",
+  "page": "Page",
+  "ai-activity-log": "AI Activity Log",
+  "activityLog": {
+    "title": "AI Activity Log",
+    "noActivities": "No AI activities found.",
+    "table": {
+      "date": "Date",
+      "query": "Search Query",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "view-results": "View Results"
+  }
   
 }

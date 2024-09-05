@@ -25,7 +25,7 @@ if (typeof window === 'undefined') {
     fs = require('fs/promises');
 }
 
-const getOpenAIApiKeyForTeam = async (teamId: string): Promise<string | null> => {
+export const getOpenAIApiKeyForTeam = async (teamId: string): Promise<string | null> => {
     try {
         const aiModel = await prisma.aIModel.findFirst({
             where: { teamId },
@@ -51,7 +51,7 @@ export const loadDocumentContent = async (relativeFilePath: string, mimeType: st
         let loader;
         switch (mimeType) {
             case 'application/pdf':
-                loader = new PDFLoader(absoluteFilePath, { splitPages: false });
+                loader = new PDFLoader(absoluteFilePath, { splitPages: true });
                 break;
             case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
                 loader = new DocxLoader(absoluteFilePath);
@@ -88,8 +88,8 @@ if (!AZURE_AISEARCH_ENDPOINT || !AZURE_AISEARCH_KEY) {
 // Function to split document content into chunks using RecursiveCharacterTextSplitter
 export const splitDocumentIntoChunks = async (docs: Document[]) => {
     const splitter = new RecursiveCharacterTextSplitter({
-        chunkSize: 1024,
-        chunkOverlap: 128,
+        chunkSize: 16384,
+        chunkOverlap: 1024,
     });
 
     const splitDocuments = await splitter.splitDocuments(docs);
@@ -98,11 +98,11 @@ export const splitDocumentIntoChunks = async (docs: Document[]) => {
         text: chunk.pageContent,
         wordCount: chunk.pageContent.split(/\s+/).filter(word => word.length > 0).length,
         characterCount: chunk.pageContent.length,
-        pageNumber: chunk.metadata?.loc.pageNumber || 1,
+        pageNumber: chunk.metadata?.loc.pageNumber,
     }));
 };
 
-const createVectorStore = (openAIApiKey: string) => {
+const createVectorStore = async (openAIApiKey: string) => {
     const embeddingModel = new OpenAIEmbeddings({ apiKey: openAIApiKey });
     return new AzureAISearchVectorStore(embeddingModel, {
         endpoint: AZURE_AISEARCH_ENDPOINT,
@@ -112,7 +112,7 @@ const createVectorStore = (openAIApiKey: string) => {
     });
 };
 
-const mapChunksToDocuments = (textChunks: any[], documentId: string, teamId: string, title: string) => {
+const mapChunksToDocuments = async (textChunks: any[], documentId: string, teamId: string, title: string) => {
     return textChunks.map((chunk) => {
         const wordCount = chunk.wordCount !== undefined ? chunk.wordCount.toString() : "0";
         const characterCount = chunk.characterCount !== undefined ? chunk.characterCount.toString() : "0";
@@ -135,6 +135,48 @@ const mapChunksToDocuments = (textChunks: any[], documentId: string, teamId: str
         });
     });
 };
+
+export const addMetadataToPDFDocuments = async (
+    documents,       // Array of Documents (single pages of PDF)
+    documentId,      // Unique ID for the document
+    teamId,          // Team ID
+    title            // Title of the document
+) => {
+    // Iterate over each document (representing a single page) and add metadata
+    return await Promise.all(documents.map(async (document, index) => {
+        const pageNumber = index + 1; // Assuming pageNumber starts at 1
+        const wordCount = document.pageContent.split(/\s+/).filter(word => word.length > 0).length;
+        const characterCount = document.pageContent.length;
+
+        // Create new attributes
+        const newAttributes = [
+            { key: 'documentId', value: documentId },
+            { key: 'teamId', value: teamId },
+            { key: 'title', value: title },
+            { key: 'chunkIndex', value: index.toString() },
+            { key: 'wordCount', value: wordCount.toString() },
+            { key: 'characterCount', value: characterCount.toString() },
+            { key: 'pageNumber', value: pageNumber.toString() }
+        ];
+
+        // Extract existing metadata, if any
+        const existingMetadata = document.metadata || {};
+        const existingAttributes = existingMetadata.attributes || [];
+
+        // Merge existing attributes with new attributes
+        const mergedAttributes = [...existingAttributes, ...newAttributes];
+
+        // Return the updated document with merged metadata
+        return {
+            ...document,
+            metadata: {
+                source: existingMetadata.source || 'Document', // Preserve existing source or default to 'Document'
+                attributes: mergedAttributes
+            }
+        };
+    }));
+};
+
 export const vectorizeChunks = async (documentId: string, teamId: string, title: string, content: string, mimeType: string) => {
     try {
         // Fetch OpenAI API key for the team
@@ -144,14 +186,19 @@ export const vectorizeChunks = async (documentId: string, teamId: string, title:
         }
 
         const docs = await loadDocumentContent(content, mimeType);
+        if (mimeType !== 'application/pdf') {
+            const textChunks = await splitDocumentIntoChunks(docs);
+            const vectorStore = await createVectorStore(openAIApiKey);
+            const documents = await mapChunksToDocuments(textChunks, documentId, teamId, title);
+            await vectorStore.addDocuments(documents);
+        } else if (mimeType === 'application/pdf') {
+            const vectorStore = await createVectorStore(openAIApiKey);
+            const docswithmetadata = await addMetadataToPDFDocuments(docs, documentId, teamId, title);
+            console.log(docswithmetadata);
+            await vectorStore.addDocuments(docswithmetadata);
+        }
 
-        const textChunks = await splitDocumentIntoChunks(docs);
 
-        const vectorStore = createVectorStore(openAIApiKey);
-
-        const documents = mapChunksToDocuments(textChunks, documentId, teamId, title);
-
-        await vectorStore.addDocuments(documents);
 
     } catch (error) {
         console.error('Error vectorizing chunks:', error);
@@ -159,53 +206,68 @@ export const vectorizeChunks = async (documentId: string, teamId: string, title:
     }
 };
 
-// New function to retrieve vectors for a documentId
-export const getVectorsForDocumentFromVectorDB = async (documentId: string, teamId: string) => {
-    try {
-      const openAIApiKey = await getOpenAIApiKeyForTeam(teamId);
-      if (!openAIApiKey) {
-        throw new Error(`OpenAI API key not found for team ID: ${teamId}`);
-      }
-  
-      const vectorStore = createVectorStore(openAIApiKey);
-  
-      // Fetch vectors for the given documentId
-      const filter: AzureAISearchFilterType = {
-        filterExpression: `metadata/attributes/any(attr: attr/key eq 'documentId' and attr/value eq '${documentId}')`, includeEmbeddings: true,
-      };
-      const results = await vectorStore.similaritySearch("", 10000, filter); // Empty query with a large limit to retrieve all vectors
-      return results.map(result => ({
-        content: result.pageContent,
-        metadata: result.metadata,
-      }));
-    } catch (error) {
-      console.error('Error retrieving vectors:', error);
-      throw error;
-    }
-  };
-  
-  // New function to store vectors in Prisma DB
-  export const addVectorsInPrismaDB = async (vectors: { content: string, metadata: any }[], documentId: string) => {
-    try {
-      for (const vector of vectors) {
-        await prisma.documentVector.create({
-          data: {
-            documentId,
-            embedding: vector.metadata.embedding,
-            content: vector.content,
-            metadata: vector.metadata.attributes,
-          },
-        });
-      }
-      console.log(`Successfully stored vectors in Prisma DB`);
-    } catch (error) {
-      console.error('Error storing vectors in Prisma DB:', error);
-      throw error;
-    }
-  };
-  
+// Function to delay execution for a specified number of milliseconds
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Function to delete vectors associated with a document
+export const getVectorsForDocumentFromVectorDB = async (documentId: string, teamId: string) => {
+    const MAX_RETRIES = 3; // Maximum number of retries
+    const RETRY_DELAY = 5000; // Delay between retries in milliseconds (5 seconds)
+
+    try {
+        const openAIApiKey = await getOpenAIApiKeyForTeam(teamId);
+        if (!openAIApiKey) {
+            throw new Error(`OpenAI API key not found for team ID: ${teamId}`);
+        }
+
+        const vectorStore = await createVectorStore(openAIApiKey);
+
+        // Retry logic
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            // Fetch vectors for the given documentId
+            const filter: AzureAISearchFilterType = {
+                filterExpression: `metadata/attributes/any(attr: attr/key eq 'documentId' and attr/value eq '${documentId}')`, includeEmbeddings: true,
+            };
+
+            const results = await vectorStore.similaritySearch("", 10000, filter);
+
+            if (results.length > 0) {
+                return results.map(result => ({
+                    content: result.pageContent,
+                    metadata: result.metadata,
+                }));
+            }
+
+            console.warn(`Attempt ${attempt} failed getVectorsForDocumentFromVectorDB(), retrying in ${RETRY_DELAY}ms...`);
+            await delay(RETRY_DELAY);
+        }
+
+        throw new Error(`Failed to retrieve vectors for document ID: ${documentId} after ${MAX_RETRIES} attempts`);
+
+    } catch (error) {
+        console.error('Error retrieving vectors:', error);
+        throw error;
+    }
+};
+
+export const addVectorsInPrismaDB = async (vectors: { content: string, metadata: any }[], documentId: string) => {
+    try {
+        for (const vector of vectors) {
+            await prisma.documentVector.create({
+                data: {
+                    documentId,
+                    embedding: vector.metadata.embedding,
+                    content: vector.content,
+                    metadata: vector.metadata.attributes,
+                },
+            });
+        }
+        console.log(`Successfully stored vectors in Prisma DB`);
+    } catch (error) {
+        console.error('Error storing vectors in Prisma DB:', error);
+        throw error;
+    }
+};
+
 export const deleteVectorsFromVectorDB = async (documentId: string, teamId: string) => {
     try {
         // Fetch OpenAI API key for the team
@@ -214,7 +276,7 @@ export const deleteVectorsFromVectorDB = async (documentId: string, teamId: stri
             throw new Error(`OpenAI API key not found for team ID: ${teamId}`);
         }
 
-        const vectorStore = createVectorStore(openAIApiKey);
+        const vectorStore = await createVectorStore(openAIApiKey);
 
         // Delete documents based on the metadata attribute `documentId`
         await vectorStore.delete({ filter: { filterExpression: `metadata/attributes/any(attr: attr/key eq 'documentId' and attr/value eq '${documentId}')` } });

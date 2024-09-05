@@ -1,6 +1,8 @@
+// pages/api/ai-research/index.ts
 import { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '../../../lib/prisma';
 import { getSession } from '../../../lib/session';
+import { getUserBySession } from 'models/user';
+import { createAIRequestQueue } from '../../../models/aiRequestQueue';
 import { processResearchRequestQueue } from '../../../lib/researchQueue';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -22,24 +24,29 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const { userId, teamId, documentIds, userSearchQuery, similarityScore, sequentialQuery, enhancedSearch } = req.body;
-
-    if (!userId || !teamId || !documentIds || !userSearchQuery) {
+    const user =  await getUserBySession(session);
+    
+    if (!user || !teamId || !documentIds || !userSearchQuery) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
 
     try {
-        const newRequest = await prisma.aIRequestQueue.create({
-            data: {
-                userId,
-                teamId,
-                documentIds,
-                userSearchQuery,
-                similarityScore: similarityScore || 1.0,
-                sequentialQuery: sequentialQuery !== undefined ? sequentialQuery : true,
-                enhancedSearch: enhancedSearch !== undefined ? enhancedSearch : false,
-            },
+        // Use the createAIRequestQueue model function to create a new request
+        const newRequest = await createAIRequestQueue({
+            userId : user.id,
+            teamId,
+            documentIds,
+            userSearchQuery,
+            similarityScore: similarityScore || 1.0,
+            sequentialQuery: sequentialQuery !== undefined ? sequentialQuery : true,
+            enhancedSearch: enhancedSearch !== undefined ? enhancedSearch : false,
+            status: 'in queue',  // Set initial status to 'in queue'
+            individualFindings: [],
+            overallSummary: '',
         });
 
+        console.log(newRequest);
+        // Process the request queue for the team
         processResearchRequestQueue(teamId);
 
         return res.status(201).json(newRequest);
