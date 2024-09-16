@@ -2,6 +2,7 @@
 import { prisma } from '../lib/prisma';
 import { sequentialRAGChain, createRAGChain, createOpenAISummary } from '../lib/langchainIntegration';
 import { getVectorsForDocumentFromVectorDB } from '../lib/vectorization';
+import { Page } from 'openai/pagination';
 
 export async function processResearchRequestQueue(teamId: string) {
     const pendingRequest = await prisma.aIRequestQueue.findFirst({
@@ -27,7 +28,7 @@ export async function processResearchRequestQueue(teamId: string) {
 
         // Retrieve document chunks using getVectorsForDocumentFromVectorDB
         const documentChunks = await getVectorsForDocumentFromVectorDB(documentId, teamId);
-        console.log(documentChunks);
+
         const findings = await handleDocumentSearch(documentChunks, userSearchQuery, sequentialQuery, teamId);
 
         allFindings = allFindings.concat(findings);
@@ -75,14 +76,15 @@ async function handleDocumentSearch(documentChunks: { content: string, metadata:
 
     if (sequential) {
         for (const chunk of documentChunks) {
-            const result = await createRAGChain(query, [chunk], teamId);
+            const result = await createRAGChain(query, chunk, teamId);
             
             const finding = {
                 title: extractMetadataValue(chunk.metadata.attributes, 'title') || 'Untitled Document',
                 page: extractMetadataValue(chunk.metadata.attributes, 'pageNumber') || 'N/A',
-                content: result,
+                // pageContent: chunk.content,
+                content: result.content,
             };
-
+            console.log(finding);
             allFindings.push(finding);
         }
     } else {

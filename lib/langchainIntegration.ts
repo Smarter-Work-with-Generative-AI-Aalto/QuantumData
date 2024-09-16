@@ -8,37 +8,36 @@ import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { pull } from 'langchain/hub';
 import { getOpenAIApiKeyForTeam } from './vectorization';
 
-const createRAGChain = async (query: string, contextDocs: any[], teamId: string) => {
+const createRAGChain = async (query: string, contextDocs: any, teamId: string) => {
     const teamOpenAIApiKey = await getOpenAIApiKeyForTeam(teamId);
     if (!teamOpenAIApiKey) {
         throw new Error(`OpenAI API key not found for team ID: ${teamId}`);
     }
 
-    const vectorStore = new AzureAISearchVectorStore(
-        new OpenAIEmbeddings({ apiKey: teamOpenAIApiKey }),
-        {
-            endpoint: process.env.AZURE_AISEARCH_ENDPOINT,
-            key: process.env.AZURE_AISEARCH_KEY,
-            indexName: 'vectorsearch',
-            search: { type: AzureAISearchQueryType.SimilarityHybrid },
-        }
-    );
+    // const vectorStore = new AzureAISearchVectorStore(
+    //     new OpenAIEmbeddings({ apiKey: teamOpenAIApiKey }),
+    //     {
+    //         endpoint: process.env.AZURE_AISEARCH_ENDPOINT,
+    //         key: process.env.AZURE_AISEARCH_KEY,
+    //         indexName: 'vectorsearch',
+    //         search: { type: AzureAISearchQueryType.SimilarityHybrid },
+    //     }
+    // );
 
-    const retriever = vectorStore.asRetriever();
-    const prompt = await pull<ChatPromptTemplate>('rlm/rag-prompt');
+    // const retriever = vectorStore.asRetriever();
+    // const prompt = await pull<ChatPromptTemplate>('rlm/rag-prompt');
+    
+    // const ragChain = await createStuffDocumentsChain({
+    //     llm,
+    //     prompt,
+    //     outputParser: new StringOutputParser(),
+    // });
+
+    // const retrievedDocs = await retriever.invoke(query);
+    // console.log('retrievedDocs', retrievedDocs);
     const llm = new ChatOpenAI({ model: 'gpt-4o', temperature: 0, apiKey: teamOpenAIApiKey});
-    const ragChain = await createStuffDocumentsChain({
-        llm,
-        prompt,
-        outputParser: new StringOutputParser(),
-    });
-
-    const retrievedDocs = await retriever.invoke(query);
-    console.log('retrievedDocs', retrievedDocs);
-    const response = await ragChain.invoke({
-        question: query,
-        context: retrievedDocs,
-    });
+    const queryPrompt = `${query}\n\nExcerpt: ${JSON.stringify(contextDocs)}`;
+    const response = await llm.invoke(queryPrompt);
 
     return response;
 };
